@@ -57,10 +57,10 @@ const handleLastMatchAnalysis = async () => {
     const res = await fetch("http://localhost:8000/analyze", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ moves }),  // <-- send moves array
+      body: JSON.stringify({ moves }), 
     })
     const data = await res.json()
-    console.log("Stockfish response:", data) // <-- check this
+    console.log("Stockfish response:", data) 
 
     const normalized = {
       evalTrend: data.eval_trend || [],
@@ -72,7 +72,7 @@ const handleLastMatchAnalysis = async () => {
       })),
     }
 
-    console.log("Normalized analysis:", normalized) // <-- check this
+    console.log("Normalized analysis:", normalized)
     setAnalysis(normalized)
   } catch (err) {
     console.error("Error fetching analysis:", err)
@@ -91,7 +91,7 @@ const handleLastMatchAnalysis = async () => {
           </DialogTitle>
         </DialogHeader>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-2 lg:pl-0">
           {/* Game Information */}
           <Card>
             <CardHeader>
@@ -100,68 +100,62 @@ const handleLastMatchAnalysis = async () => {
                 Game Information
               </CardTitle>
             </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="flex items-center gap-2">
-                <Calendar className="h-4 w-4 text-muted-foreground" />
-                <span className="font-medium">Date:</span>
-                <span>
-                  {new Date(game.date).toLocaleDateString("en-US", {
-                    weekday: "long",
-                    year: "numeric",
-                    month: "long",
-                    day: "numeric",
-                  })}
-                </span>
+            <CardContent className="space-y-4 flex flex-col">
+              <div className="flex flex-col gap-1">
+                <div className="flex items-center gap-2">
+                  <Calendar className="h-4 w-4 text-muted-foreground" />
+                  <span className="font-medium">Date:</span>
+                  <span className="break-words">
+                    {new Date(game.date).toLocaleDateString("en-US", {
+                      weekday: "long",
+                      year: "numeric",
+                      month: "long",
+                      day: "numeric",
+                    })}
+                  </span>
+                </div>
+                <div className="flex items-center gap-2 flex-wrap">
+                  <User className="h-4 w-4 text-muted-foreground" />
+                  <span className="font-medium">Opponent:</span>
+                  <span className="font-mono break-all">{game.opponent}</span>
+                  <span className="text-muted-foreground">({game.opponentRating})</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="font-medium">Playing as:</span>
+                  <span
+                    className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
+                      game.color === "White" ? "bg-gray-100 text-gray-800" : "bg-gray-800 text-gray-100"
+                    }`}
+                  >
+                    {game.color}
+                  </span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Clock className="h-4 w-4 text-muted-foreground" />
+                  <span className="font-medium">Time Control:</span>
+                  <span>{game.timeControl}</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Target className="h-4 w-4 text-muted-foreground" />
+                  <span className="font-medium">Result:</span>
+                  <span className={`font-semibold ${getResultColor(game.result)}`}>{game.result}</span>
+                </div>
               </div>
-
-              <div className="flex items-center gap-2">
-                <User className="h-4 w-4 text-muted-foreground" />
-                <span className="font-medium">Opponent:</span>
-                <span className="font-mono">{game.opponent}</span>
-                <span className="text-muted-foreground">({game.opponentRating})</span>
-              </div>
-
-              <div className="flex items-center gap-2">
-                <span className="font-medium">Playing as:</span>
-                <span
-                  className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
-                    game.color === "White" ? "bg-gray-100 text-gray-800" : "bg-gray-800 text-gray-100"
-                  }`}
-                >
-                  {game.color}
-                </span>
-              </div>
-
-              <div className="flex items-center gap-2">
-                <Clock className="h-4 w-4 text-muted-foreground" />
-                <span className="font-medium">Time Control:</span>
-                <span>{game.timeControl}</span>
-              </div>
-
-              <div className="flex items-center gap-2">
-                <Target className="h-4 w-4 text-muted-foreground" />
-                <span className="font-medium">Result:</span>
-                <span className={`font-semibold ${getResultColor(game.result)}`}>{game.result}</span>
-              </div>
-
               <Separator />
-
               <Button
                 variant="outline"
                 className="w-full gap-2 bg-transparent"
                 onClick={() => window.open(game.gameUrl, "_blank")}
               >
                 <ExternalLink className="h-4 w-4" />
-                View on Lichess
+                ViewGame
               </Button>
-
-              {/* Last Match Analysis Button */}
               <Button
                 variant="default"
                 className="w-full mt-4"
                 onClick={handleLastMatchAnalysis}
               >
-                Analyze Last Match
+                Analyze
               </Button>
             </CardContent>
           </Card>
