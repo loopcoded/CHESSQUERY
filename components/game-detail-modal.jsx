@@ -54,7 +54,7 @@ const handleLastMatchAnalysis = async () => {
   setLoading(true)
   try {
     const moves = parsePgnToMoves(game.pgn)
-    const res = await fetch("http://localhost:8000/analyze", {
+    const res = await fetch(process.env.BACKEND_URL + "/analyze", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ moves }), 

@@ -5,14 +5,18 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 import chess
 import chess.engine
+import uvicorn
+import os
 
 if sys.platform == "win32":
     asyncio.set_event_loop_policy(asyncio.WindowsProactorEventLoopPolicy())
 
 app = FastAPI()
 
-# Allow requests from your frontend
-origins = ["http://localhost:3000"]
+origins = [
+    "http://localhost:3000",              # local frontend
+    "https://your-frontend.vercel.app"    # deployed frontend
+]
 
 app.add_middleware(
     CORSMiddleware,
@@ -87,3 +91,7 @@ async def analyze_game(req: GameRequest):
 @app.on_event("shutdown")
 def shutdown_event():
     engine.quit()
+
+if __name__ == "__main__":
+    port = int(os.environ.get("PORT", 8000))  
+    uvicorn.run(app, host="0.0.0.0", port=port)
