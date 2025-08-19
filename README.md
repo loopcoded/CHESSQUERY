@@ -1,4 +1,4 @@
-#CHESSQUERY
+##CHESSQUERY
 
 A sleek, interactive React-based chess dashboard that fetches a player’s recent games and statistics from [Lichess](https://lichess.org/) and provides detailed game analysis using Stockfish. Designed to help chess enthusiasts track their performance and identify improvement areas.
 
