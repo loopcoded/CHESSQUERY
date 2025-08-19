@@ -14,8 +14,10 @@ A sleek, interactive React-based chess dashboard that fetches a player’s recen
 - **Game Filtering & Sorting:** Filter games by result, color, time control, or opening; sort by date, opponent rating, or result.
 <img width="1640" height="842" alt="image" src="https://github.com/user-attachments/assets/873cc8c9-9537-4203-aba9-4d19c7aad6a0" />
 - **Recent Games Table:** Interactive table showing a player’s recent games with opponent, rating, result, color, time control, and opening.
+ 
 - **Opening Statistics:** Visualize the most played openings and ECO codes.
 - <img width="620" height="762" alt="image" src="https://github.com/user-attachments/assets/bf120048-8944-4590-b3da-ba4bf5646e12" />
+
 - **Game Analysis:** Integrates with Stockfish engine to analyze moves, highlight mistakes and blunders, and show evaluation trends.
 <img width="1082" height="146" alt="image" src="https://github.com/user-attachments/assets/84bb0e59-11ed-4dc3-b0de-1f9ce96c632f" />
 - **Responsive UI:** Clean, mobile-friendly design with blurred background overlay for readability.
