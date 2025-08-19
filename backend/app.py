@@ -1,22 +1,23 @@
-import asyncio
+import os
 import sys
+import asyncio
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 import chess
 import chess.engine
 import uvicorn
-import os
 
+# Fix asyncio on Windows
 if sys.platform == "win32":
     asyncio.set_event_loop_policy(asyncio.WindowsProactorEventLoopPolicy())
 
 app = FastAPI()
 
-origins = [
-    "http://localhost:3000",              # local frontend
-    "https://your-frontend.vercel.app"    # deployed frontend
-]
+# ---------- DYNAMIC CORS ----------
+LOCAL_ORIGIN = "http://localhost:3000"
+PROD_ORIGIN = os.environ.get("FRONTEND_URL", "https://your-frontend.vercel.app")
+origins = [LOCAL_ORIGIN, PROD_ORIGIN]
 
 app.add_middleware(
     CORSMiddleware,
@@ -26,12 +27,25 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-STOCKFISH_PATH = r"D:\\stockfish-windows-x86-64-avx2\\stockfish\\stockfish-windows-x86-64-avx2.exe"
+# ---------- STOCKFISH SETUP ----------
+# Determine OS-specific Stockfish binary
+if sys.platform == "win32":
+    STOCKFISH_PATH = os.path.join(os.path.dirname(__file__), "stockfish/stockfish-windows.exe")
+else:  # Linux (Render)
+    STOCKFISH_PATH = os.path.join(os.path.dirname(__file__), "stockfish/stockfish-linux")
+
+# Ensure Linux binary is executable
+if sys.platform != "win32":
+    os.chmod(STOCKFISH_PATH, 0o755)
+
+# Initialize engine
 engine = chess.engine.SimpleEngine.popen_uci(STOCKFISH_PATH)
 
+# ---------- API MODELS ----------
 class GameRequest(BaseModel):
     moves: list[str]
 
+# ---------- ANALYSIS ENDPOINT ----------
 @app.post("/analyze")
 async def analyze_game(req: GameRequest):
     board = chess.Board()
@@ -71,7 +85,7 @@ async def analyze_game(req: GameRequest):
                     "type": mistake_type
                 })
             else:
-                # For lost games, flag small negative deltas as minor mistakes
+                # minor mistakes
                 if score < 0 and eval_trend[-2] > score:
                     mistake_type = "minor"
                     mistakes.append({
@@ -88,10 +102,12 @@ async def analyze_game(req: GameRequest):
         "blunders": blunders
     }
 
+# ---------- CLEANUP ----------
 @app.on_event("shutdown")
 def shutdown_event():
     engine.quit()
 
+# ---------- START SERVER ----------
 if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 8000))  
+    port = int(os.environ.get("PORT", 8000))  # Render injects this
     uvicorn.run(app, host="0.0.0.0", port=port)
